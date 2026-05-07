@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prenestina Ricambi · Bozza UI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Inter Tight', system-ui, sans-serif;
+    background: #f4f4f0;
+    color: #1a1a1a;
+  }
+  * { box-sizing: border-box; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel" src="screens.jsx"></script>
+
+<script type="text/babel" data-presets="react">
+  const { useState, useEffect } = React;
+
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "accent": "#c8202c",
+    "density": "comfortable",
+    "heroStyle": "type",
+    "showFooterInFrame": true
+  }/*EDITMODE-END*/;
+
+  const ACCENT_OPTIONS = [
+    '#c8202c', // logo red
+    '#e8a13a', // amber/chrome warm
+    '#1a4ba8', // logo blue
+    '#d6d6d6'  // mono chrome
+  ];
+
+  function App() {
+    const t = useTweaks(TWEAK_DEFAULTS);
+    const accent = t.accent || '#c8202c';
+
+    return (
+      <>
+        <DesignCanvas
+          background="#f4f4f0"
+          padding={[80, 60, 60]}
+          title="Prenestina Ricambi · Bozza UI mobile"
+          subtitle="Schermate di partenza per il sito vetrina — da sviluppare con Claude Code"
+        >
+          <DCSection
+            id="screens"
+            title="Schermate principali"
+            subtitle="Direzione: premium automotive — nero, cromature, accento rosso. Mobile-first."
+          >
+            <DCArtboard id="home" label="01 · Home" width={420} height={920}>
+              <IOSDevice dark width={420} height={920}>
+                <HomeScreen accent={accent} />
+              </IOSDevice>
+            </DCArtboard>
+
+            <DCArtboard id="about" label="02 · Chi siamo" width={420} height={920}>
+              <IOSDevice dark width={420} height={920}>
+                <AboutScreen accent={accent} />
+              </IOSDevice>
+            </DCArtboard>
+
+            <DCArtboard id="contact" label="03 · Contatti" width={420} height={920}>
+              <IOSDevice dark width={420} height={920}>
+                <ContactScreen accent={accent} />
+              </IOSDevice>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection
+            id="system"
+            title="Sistema visivo"
+            subtitle="Token e componenti che reggono tutta la UI. Da consegnare a Claude Code come reference."
+          >
+            <DCArtboard id="palette" label="Palette" width={520} height={520}>
+              <PaletteCard accent={accent}/>
+            </DCArtboard>
+            <DCArtboard id="type" label="Tipografia" width={520} height={520}>
+              <TypeCard/>
+            </DCArtboard>
+            <DCArtboard id="components" label="Componenti" width={520} height={520}>
+              <ComponentsCard accent={accent}/>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection
+            id="notes"
+            title="Note per lo sviluppo"
+            subtitle="Cose da definire con il cliente prima di sviluppare."
+          >
+            <DCArtboard id="todo" label="To-do" width={520} height={520}>
+              <NotesCard/>
+            </DCArtboard>
+          </DCSection>
+        </DesignCanvas>
+
+        <TweaksPanel title="Tweaks">
+          <TweakSection title="Brand">
+            <TweakColor
+              label="Colore accento"
+              value={t.accent}
+              onChange={v => t.set('accent', v)}
+              options={ACCENT_OPTIONS}
+            />
+          </TweakSection>
+        </TweaksPanel>
+      </>
+    );
+  }
+
+  // ─── DESIGN SYSTEM CARDS ─────────────────────────────────────────
+
+  function PaletteCard({ accent }) {
+    const swatches = [
+      { name: 'BG', hex: '#0a0a0c', text: '#fff' },
+      { name: 'Surface', hex: '#16161c', text: '#fff' },
+      { name: 'Line', hex: '#2a2a33', text: '#fff' },
+      { name: 'Text', hex: '#f5f5f7', text: '#000' },
+      { name: 'Text dim', hex: '#9a9aa6', text: '#000' },
+      { name: 'Accent', hex: accent, text: '#fff' },
+      { name: 'Chrome A', hex: '#3a3a44', text: '#fff' },
+      { name: 'Chrome B', hex: '#e6e6ea', text: '#000' },
+    ];
+    return (
+      <div style={{
+        background: '#0a0a0c', color: '#f5f5f7', height: '100%',
+        padding: 32, fontFamily: 'Inter Tight, system-ui',
+      }}>
+        <div style={{
+          fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+          letterSpacing: '0.28em', color: accent, textTransform: 'uppercase',
+        }}>— Tokens</div>
+        <h2 style={{
+          margin: '8px 0 24px', fontFamily: 'Manrope', fontWeight: 800,
+          fontSize: 28, letterSpacing: '-0.02em',
+        }}>Palette</h2>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8,
+        }}>
+          {swatches.map(s => (
+            <div key={s.name} style={{
+              aspectRatio: '1 / 1', borderRadius: 10,
+              background: s.hex, color: s.text,
+              padding: 10, display: 'flex', flexDirection: 'column',
+              justifyContent: 'space-between',
+              border: '1px solid rgba(255,255,255,0.05)',
+              fontFamily: 'JetBrains Mono', fontSize: 9.5, letterSpacing: '0.05em',
+            }}>
+              <span style={{ fontWeight: 600 }}>{s.name}</span>
+              <span style={{ opacity: 0.7 }}>{s.hex.toUpperCase()}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function TypeCard() {
+    return (
+      <div style={{
+        background: '#0a0a0c', color: '#f5f5f7', height: '100%',
+        padding: 32, fontFamily: 'Inter Tight, system-ui',
+      }}>
+        <div style={{
+          fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+          letterSpacing: '0.28em', color: '#c8202c', textTransform: 'uppercase',
+        }}>— Type</div>
+        <h2 style={{
+          margin: '8px 0 28px', fontFamily: 'Manrope', fontWeight: 800,
+          fontSize: 28, letterSpacing: '-0.02em',
+        }}>Tipografia</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div>
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#6b6b76', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>Display · Manrope 800</div>
+            <div style={{ fontFamily: 'Manrope', fontWeight: 800, fontSize: 42, letterSpacing: '-0.035em', lineHeight: 0.95 }}>
+              Il ricambio<br/>giusto. Subito.
+            </div>
+          </div>
+          <div>
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#6b6b76', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>Heading · Manrope 700</div>
+            <div style={{ fontFamily: 'Manrope', fontWeight: 700, fontSize: 22, letterSpacing: '-0.01em' }}>
+              Marchi trattati
+            </div>
+          </div>
+          <div>
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#6b6b76', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>Body · Inter Tight 400</div>
+            <div style={{ fontFamily: 'Inter Tight', fontSize: 14, color: '#9a9aa6', lineHeight: 1.5 }}>
+              Ricambi auto e moto per privati, officine e rivenditori. A magazzino o su ordinazione in 24/48h.
+            </div>
+          </div>
+          <div>
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 10, color: '#6b6b76', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: 6 }}>Kicker · JetBrains Mono</div>
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: '#c8202c', letterSpacing: '0.28em', textTransform: 'uppercase' }}>
+              — APRILIA · DAL 1998
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function ComponentsCard({ accent }) {
+    return (
+      <div style={{
+        background: '#0a0a0c', color: '#f5f5f7', height: '100%',
+        padding: 32, fontFamily: 'Inter Tight, system-ui',
+      }}>
+        <div style={{
+          fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+          letterSpacing: '0.28em', color: accent, textTransform: 'uppercase',
+        }}>— UI Kit</div>
+        <h2 style={{
+          margin: '8px 0 24px', fontFamily: 'Manrope', fontWeight: 800,
+          fontSize: 28, letterSpacing: '-0.02em',
+        }}>Componenti</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          {/* CTAs */}
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button style={{
+              flex: 1, height: 50, borderRadius: 12, border: 'none',
+              background: `linear-gradient(180deg, ${shade(accent, 8)} 0%, ${shade(accent, -25)} 100%)`,
+              color: '#fff', fontFamily: 'Manrope', fontWeight: 700, fontSize: 13,
+              letterSpacing: '0.05em', textTransform: 'uppercase',
+              boxShadow: `0 1px 0 rgba(255,255,255,0.18) inset, 0 -1px 0 rgba(0,0,0,0.3) inset, 0 8px 24px ${accent}55`,
+            }}>Primary CTA</button>
+            <button style={{
+              flex: 1, height: 50, borderRadius: 12,
+              background: '#16161c', color: '#f5f5f7',
+              border: '1px solid #2a2a33',
+              fontFamily: 'Manrope', fontWeight: 600, fontSize: 13,
+              letterSpacing: '0.05em', textTransform: 'uppercase',
+            }}>Ghost</button>
+          </div>
+          {/* card */}
+          <div style={{
+            borderRadius: 14, padding: 16,
+            border: '1px solid #2a2a33', background: '#16161c',
+            display: 'flex', gap: 14,
+          }}>
+            <div style={{
+              width: 44, height: 44, borderRadius: 10,
+              background: '#0a0a0c', border: '1px solid #2a2a33',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: accent, fontFamily: 'Manrope', fontWeight: 800, fontSize: 16,
+            }}>P</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: 'Manrope', fontWeight: 700, fontSize: 14 }}>Card componente</div>
+              <div style={{ fontFamily: 'Inter Tight', fontSize: 12, color: '#9a9aa6', marginTop: 4, lineHeight: 1.45 }}>Bordo cromato sottile, fondo surface, padding 16.</div>
+            </div>
+          </div>
+          {/* input */}
+          <div style={{
+            background: '#16161c', border: '1px solid #2a2a33',
+            borderRadius: 10, padding: '14px 14px',
+            fontFamily: 'Inter Tight', fontSize: 13.5, color: '#6b6b76',
+          }}>Es. pastiglie freno anteriori…</div>
+          {/* chip row */}
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {['Auto', 'Moto', 'Officina', 'Originali'].map(c => (
+              <div key={c} style={{
+                padding: '8px 12px', borderRadius: 999,
+                background: '#16161c', border: '1px solid #2a2a33',
+                fontFamily: 'Manrope', fontSize: 11, fontWeight: 600,
+                letterSpacing: '0.08em', textTransform: 'uppercase',
+              }}>{c}</div>
+            ))}
+          </div>
+          {/* chrome rule */}
+          <div style={{
+            height: 1,
+            background: 'linear-gradient(90deg, transparent, #3a3a44 15%, #e6e6ea 50%, #3a3a44 85%, transparent)',
+            opacity: 0.45,
+          }}/>
+          <div style={{
+            fontFamily: 'JetBrains Mono', fontSize: 10, color: '#6b6b76',
+            letterSpacing: '0.15em', textTransform: 'uppercase',
+          }}>↑ Chrome rule · usata per separare sezioni</div>
+        </div>
+      </div>
+    );
+  }
+
+  function NotesCard() {
+    const items = [
+      { tag: 'Contenuti', text: 'Indirizzo esatto, telefono, P.IVA, anno fondazione, marchi reali, foto del negozio.' },
+      { tag: 'Mappa', text: 'Sostituire mockup con embed Google Maps della posizione reale.' },
+      { tag: 'WhatsApp', text: 'Confermare numero WhatsApp Business per il link diretto.' },
+      { tag: 'Form', text: 'Decidere destinazione email del form richiesta ricambi.' },
+      { tag: 'SEO', text: 'Title/meta orientati a "ricambi auto Aprilia", schema.org LocalBusiness.' },
+      { tag: 'Hosting', text: 'Statico (Vercel/Netlify) basta — nessuna logica server.' },
+    ];
+    return (
+      <div style={{
+        background: '#0a0a0c', color: '#f5f5f7', height: '100%',
+        padding: 32, fontFamily: 'Inter Tight, system-ui',
+      }}>
+        <div style={{
+          fontFamily: 'JetBrains Mono, monospace', fontSize: 10,
+          letterSpacing: '0.28em', color: '#c8202c', textTransform: 'uppercase',
+        }}>— Da definire</div>
+        <h2 style={{
+          margin: '8px 0 22px', fontFamily: 'Manrope', fontWeight: 800,
+          fontSize: 28, letterSpacing: '-0.02em',
+        }}>Note di sviluppo</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {items.map((it, i) => (
+            <div key={i} style={{
+              display: 'flex', gap: 12, alignItems: 'flex-start',
+              paddingBottom: 12,
+              borderBottom: i < items.length - 1 ? '1px solid #1f1f27' : 'none',
+            }}>
+              <div style={{
+                fontFamily: 'JetBrains Mono', fontSize: 9.5,
+                letterSpacing: '0.18em', textTransform: 'uppercase',
+                color: '#c8202c', minWidth: 78, paddingTop: 2,
+              }}>{it.tag}</div>
+              <div style={{
+                flex: 1, fontFamily: 'Inter Tight', fontSize: 13,
+                color: '#c0c0ca', lineHeight: 1.5,
+              }}>{it.text}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // tiny color shade helper
+  function shade(hex, pct) {
+    const n = parseInt(hex.replace('#',''), 16);
+    let r = (n >> 16) + Math.round(2.55 * pct);
+    let g = ((n >> 8) & 0xff) + Math.round(2.55 * pct);
+    let b = (n & 0xff) + Math.round(2.55 * pct);
+    r = Math.max(0, Math.min(255, r));
+    g = Math.max(0, Math.min(255, g));
+    b = Math.max(0, Math.min(255, b));
+    return '#' + ((r<<16)|(g<<8)|b).toString(16).padStart(6,'0');
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
