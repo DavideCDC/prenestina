@@ -11,57 +11,73 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-/* ── Reset & base ─────────────────────────────────────────── */
+/* ── Reset ────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   font-family: 'Inter Tight', system-ui, sans-serif;
   background: #0a0a0c;
   color: #f5f5f7;
   -webkit-font-smoothing: antialiased;
-  overscroll-behavior-y: none;
 }
 button { font-family: inherit; cursor: pointer; border: none; background: none; }
 a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
-::-webkit-scrollbar { width: 0; height: 0; }
+::-webkit-scrollbar { width: 6px; background: #0a0a0c; }
+::-webkit-scrollbar-thumb { background: #2a2a33; border-radius: 3px; }
 
-/* ── Design tokens ────────────────────────────────────────── */
+/* ── Tokens ───────────────────────────────────────────────── */
 :root {
-  --bg:       #0a0a0c;
-  --bg2:      #111116;
-  --surf:     #16161c;
-  --surf2:    #1d1d24;
-  --line:     #2a2a33;
-  --line-soft:#1f1f27;
-  --text:     #f5f5f7;
-  --text-dim: #9a9aa6;
-  --text-mute:#6b6b76;
-  --red:      #c8202c;
-  --red-glow: rgba(200,32,44,.35);
-  --chrome1:  #3a3a44;
-  --chrome2:  #8a8a96;
-  --chrome3:  #e6e6ea;
+  --bg:        #0a0a0c;
+  --bg2:       #111116;
+  --surf:      #16161c;
+  --surf2:     #1d1d24;
+  --line:      #2a2a33;
+  --line-soft: #1f1f27;
+  --text:      #f5f5f7;
+  --text-dim:  #9a9aa6;
+  --text-mute: #6b6b76;
+  --red:       #c8202c;
+  --red-glow:  rgba(200,32,44,.35);
+  --chrome1:   #3a3a44;
+  --chrome3:   #e6e6ea;
 
-  --r-card:   14px;
-  --r-btn:    12px;
-  --px:       18px;      /* horizontal page padding */
-  --nav-h:    64px;      /* bottom nav height */
+  --r-card:    14px;
+  --r-btn:     12px;
+  --px:        18px;
+  --max-w:     1200px;
+  --topnav-h:  64px;
+  --botnav-h:  64px;
 }
 
-/* ── Layout shell ─────────────────────────────────────────── */
+/* ── Desktop overrides ────────────────────────────────────── */
+@media (min-width: 768px) {
+  :root {
+    --px: 48px;
+    --botnav-h: 0px;
+  }
+}
+@media (min-width: 1024px) {
+  :root { --px: 64px; }
+}
+
+/* ── App shell ────────────────────────────────────────────── */
 #app {
-  max-width: 520px;
+  max-width: var(--max-w);
   margin: 0 auto;
   min-height: 100dvh;
-  position: relative;
 }
 
-/* Page sections — JS toggles .active */
-.page { display: none; padding-bottom: calc(var(--nav-h) + 24px); }
-.page.active { display: block; }
+/* ── Pages ────────────────────────────────────────────────── */
+.page { display: none; padding-bottom: calc(var(--botnav-h) + 24px); }
+.page.active { display: block; animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
 
-/* ── Top bar ──────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   TOP NAV (desktop) + MOBILE TOPBAR
+   ═══════════════════════════════════════════════════════════ */
+
+/* Mobile topbar — shown below 768px */
 .topbar {
   padding: 48px var(--px) 14px;
   display: flex;
@@ -70,10 +86,63 @@ img { display: block; max-width: 100%; }
   background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
   position: sticky;
   top: 0;
-  z-index: 30;
+  z-index: 40;
 }
 .topbar-logo { height: 28px; width: auto; }
 .topbar-actions { display: flex; gap: 8px; }
+
+/* Desktop nav — hidden below 768px */
+.desktop-nav {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .topbar { display: none; }
+
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--px);
+    height: var(--topnav-h);
+    background: rgba(10,10,12,.92);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+  .desktop-nav-logo { height: 30px; width: auto; cursor: pointer; }
+  .desktop-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .desktop-nav-links button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: 'Manrope', system-ui;
+    font-weight: 600;
+    font-size: 13.5px;
+    letter-spacing: .02em;
+    color: var(--text-dim);
+    transition: color .15s, background .15s;
+  }
+  .desktop-nav-links button:hover { color: var(--text); background: var(--surf); }
+  .desktop-nav-links button.active { color: var(--text); }
+  .desktop-nav-cta {
+    background: linear-gradient(180deg, #d92836 0%, #a8141f 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px var(--red-glow);
+  }
+  .desktop-nav-cta:hover { opacity: .9; }
+
+  /* Wider page padding compensates for no sticky topbar offset */
+  .page { padding-top: 0; }
+}
+
+/* ── Shared: icon button ──────────────────────────────────── */
 .icon-btn {
   width: 38px; height: 38px;
   border-radius: 10px;
@@ -82,6 +151,7 @@ img { display: block; max-width: 100%; }
   color: var(--text);
   display: flex; align-items: center; justify-content: center;
   transition: background .15s;
+  flex-shrink: 0;
 }
 .icon-btn:hover { background: var(--surf2); }
 
@@ -94,10 +164,7 @@ img { display: block; max-width: 100%; }
 }
 
 /* ── Section head ─────────────────────────────────────────── */
-.section-head {
-  padding: 0 var(--px);
-  margin-bottom: 14px;
-}
+.section-head { padding: 0 var(--px); margin-bottom: 18px; }
 .kicker {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
@@ -112,12 +179,13 @@ img { display: block; max-width: 100%; }
   font-size: 24px;
   line-height: 1.1;
   letter-spacing: -.02em;
-  color: var(--text);
+}
+@media (min-width: 768px) {
+  .section-head h2 { font-size: 28px; }
 }
 
 /* ── Chrome-border card ───────────────────────────────────── */
 .chrome-card {
-  border-radius: var(--r-card);
   background: var(--surf);
   border: 1px solid transparent;
   background-image:
@@ -142,13 +210,9 @@ img { display: block; max-width: 100%; }
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 0 22px;
-  box-shadow:
-    0 1px 0 rgba(255,255,255,.18) inset,
-    0 -1px 0 rgba(0,0,0,.3) inset,
-    0 8px 24px var(--red-glow);
+  padding: 0 24px;
+  box-shadow: 0 1px 0 rgba(255,255,255,.18) inset, 0 -1px 0 rgba(0,0,0,.3) inset, 0 8px 24px var(--red-glow);
   transition: opacity .15s, transform .1s;
-  text-decoration: none;
 }
 .btn-red:active { opacity: .85; transform: scale(.98); }
 .btn-red.full { width: 100%; }
@@ -168,47 +232,78 @@ img { display: block; max-width: 100%; }
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 0 22px;
+  padding: 0 24px;
   transition: background .15s;
   cursor: pointer;
 }
 .btn-ghost.full { width: 100%; }
 .btn-ghost:hover { background: var(--surf2); }
 
-/* ── HOME — Hero ──────────────────────────────────────────── */
-.hero-wrap { padding: 20px var(--px) 28px; }
+/* ── Photo slot placeholder ───────────────────────────────── */
+.photo-slot {
+  border-radius: var(--r-card);
+  background-color: #1a1a22;
+  background-image: repeating-linear-gradient(135deg, #1a1a22 0 12px, #20202a 12px 24px);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .15em;
+  color: var(--text-mute);
+  text-transform: uppercase;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HOME
+   ═══════════════════════════════════════════════════════════ */
+
+/* Hero */
+.hero-wrap { padding: 20px var(--px) 36px; }
+
 .hero-box {
   border-radius: 18px;
   overflow: hidden;
-  height: 360px;
   position: relative;
   background: radial-gradient(120% 80% at 70% 20%, #1a1a24 0%, #0a0a0c 60%);
   border: 1px solid var(--line);
+  min-height: 360px;
+  display: flex;
+  align-items: flex-end;
 }
+@media (min-width: 768px) {
+  .hero-box {
+    min-height: 480px;
+    align-items: stretch;
+  }
+}
+
 .hero-stripe-bg {
   position: absolute; inset: 0;
   background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.025) 0 14px, transparent 14px 28px);
 }
 .hero-red-bar {
-  position: absolute;
-  right: -40px; top: 40px;
+  position: absolute; right: -40px; top: 40px;
   width: 220px; height: 6px;
   background: var(--red);
   transform: rotate(-18deg);
   box-shadow: 0 0 24px var(--red);
 }
 .hero-chrome-bar {
-  position: absolute;
-  right: -60px; top: 56px;
+  position: absolute; right: -60px; top: 56px;
   width: 220px; height: 1px;
   background: var(--chrome3);
   opacity: .5;
   transform: rotate(-18deg);
 }
+
+/* Mobile hero copy: absolute bottom */
 .hero-copy {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
+  position: relative;
   padding: 22px;
+  z-index: 2;
+  flex: 1;
 }
 .hero-copy .kicker { margin-bottom: 14px; }
 .hero-copy h1 {
@@ -220,47 +315,73 @@ img { display: block; max-width: 100%; }
   color: #fff;
   margin-bottom: 14px;
 }
-.hero-copy h1 .chrome-text {
+.hero-copy p {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-dim);
+  max-width: 320px;
+  margin-bottom: 22px;
+}
+.hero-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.chrome-text {
   background: linear-gradient(180deg, #fff 0%, #b8b8c0 60%, #6e6e78 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.hero-copy p {
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--text-dim);
-  max-width: 280px;
-  margin-bottom: 22px;
+
+/* Desktop hero: copy left, photo right */
+@media (min-width: 768px) {
+  .hero-box { align-items: stretch; min-height: 500px; }
+  .hero-copy {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 48px 48px 48px;
+    max-width: 560px;
+  }
+  .hero-copy h1 { font-size: 56px; }
+  .hero-copy p { font-size: 15.5px; max-width: 400px; }
+
+  .hero-photo-col {
+    flex: 1;
+    position: relative;
+    min-width: 0;
+  }
+  .hero-photo-col .photo-slot {
+    position: absolute; inset: 0;
+    border-radius: 0;
+    border: none;
+    border-left: 1px solid var(--line);
+  }
 }
 
-/* ── HOME — Category pills ────────────────────────────────── */
+/* Categorie */
 .cats {
-  padding: 0 var(--px) 30px;
+  padding: 0 var(--px) 36px;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
+@media (min-width: 768px) {
+  .cats { gap: 14px; }
+}
+
 .cat-pill {
   border-radius: 12px;
-  padding: 14px 6px;
+  padding: 18px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: var(--text);
-  background: var(--surf);
-  border: 1px solid transparent;
-  background-image:
-    linear-gradient(var(--surf), var(--surf)),
-    linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04) 30%, rgba(0,0,0,.5));
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  transition: background-color .15s;
   cursor: pointer;
+  transition: background .15s;
 }
-.cat-pill:hover { background-color: var(--surf2); }
-.cat-icon { color: var(--red); display: flex; align-items: center; justify-content: center; }
+.cat-pill:hover { filter: brightness(1.1); }
+.cat-icon { color: var(--red); display: flex; align-items: center; }
 .cat-label {
   font-family: 'Manrope', system-ui;
   font-size: 11px;
@@ -268,16 +389,33 @@ img { display: block; max-width: 100%; }
   letter-spacing: .08em;
   text-transform: uppercase;
 }
+@media (min-width: 768px) {
+  .cat-label { font-size: 12px; }
+  .cat-icon svg { width: 28px; height: 28px; }
+}
 
-/* ── HOME — Services ──────────────────────────────────────── */
-.services { padding: 6px var(--px) 30px; display: flex; flex-direction: column; gap: 10px; }
+/* Servizi */
+.services {
+  padding: 6px var(--px) 36px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+@media (min-width: 768px) {
+  .services { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+}
+
 .service-card {
   border-radius: var(--r-card);
-  padding: 16px;
+  padding: 20px;
   display: flex;
   gap: 14px;
   align-items: flex-start;
 }
+@media (min-width: 768px) {
+  .service-card { flex-direction: column; gap: 16px; padding: 24px; }
+}
+
 .service-icon {
   width: 44px; height: 44px;
   border-radius: 10px;
@@ -296,18 +434,15 @@ img { display: block; max-width: 100%; }
   color: var(--text);
   margin-bottom: 4px;
 }
-.service-sub {
-  font-size: 12.5px;
-  color: var(--text-dim);
-  line-height: 1.45;
-}
+.service-sub { font-size: 12.5px; color: var(--text-dim); line-height: 1.45; }
 
-/* ── HOME — Brands grid ───────────────────────────────────── */
-.brands-wrap { padding: 6px var(--px) 30px; }
+/* Brands */
+.brands-wrap { padding: 6px var(--px) 36px; }
 .brands-grid {
   border-radius: var(--r-card);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
   background: var(--surf);
   border: 1px solid transparent;
   background-image:
@@ -315,8 +450,11 @@ img { display: block; max-width: 100%; }
     linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04) 30%, rgba(0,0,0,.5));
   background-origin: border-box;
   background-clip: padding-box, border-box;
-  overflow: hidden;
 }
+@media (min-width: 768px) {
+  .brands-grid { grid-template-columns: repeat(6, 1fr); }
+}
+
 .brand-cell {
   padding: 18px 8px;
   text-align: center;
@@ -328,8 +466,17 @@ img { display: block; max-width: 100%; }
   border-right: 1px solid var(--line-soft);
   border-bottom: 1px solid var(--line-soft);
 }
+/* Mobile: 3 cols */
 .brand-cell:nth-child(3n) { border-right: none; }
 .brand-cell:nth-child(n+10) { border-bottom: none; }
+/* Desktop: 6 cols — override nth-child */
+@media (min-width: 768px) {
+  .brand-cell:nth-child(3n)   { border-right: 1px solid var(--line-soft); }
+  .brand-cell:nth-child(n+10) { border-bottom: 1px solid var(--line-soft); }
+  .brand-cell:nth-child(6n)   { border-right: none; }
+  .brand-cell:nth-child(n+7)  { border-bottom: none; }
+}
+
 .brands-note {
   margin-top: 12px;
   text-align: center;
@@ -337,30 +484,25 @@ img { display: block; max-width: 100%; }
   color: var(--text-mute);
 }
 
-/* ── HOME — Photo slot ────────────────────────────────────── */
-.photo-slot {
-  border-radius: var(--r-card);
-  background-color: #1a1a22;
-  background-image: repeating-linear-gradient(135deg, #1a1a22 0 12px, #20202a 12px 24px);
-  border: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  letter-spacing: .15em;
-  color: var(--text-mute);
-  text-transform: uppercase;
-}
-
-/* ── HOME — CTA block ─────────────────────────────────────── */
+/* CTA block */
 .cta-block {
-  margin: 0 var(--px) 30px;
+  margin: 0 var(--px) 36px;
   border-radius: 18px;
-  padding: 22px;
+  padding: 28px;
   background: linear-gradient(180deg, var(--surf2) 0%, var(--bg2) 100%);
   border: 1px solid var(--line);
 }
+@media (min-width: 768px) {
+  .cta-block {
+    display: flex;
+    align-items: center;
+    gap: 48px;
+    padding: 40px 48px;
+  }
+  .cta-block-text { flex: 1; }
+  .cta-block-actions { flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; min-width: 240px; }
+}
+
 .cta-block .kicker { margin-bottom: 10px; }
 .cta-block h3 {
   font-family: 'Manrope', system-ui;
@@ -368,39 +510,47 @@ img { display: block; max-width: 100%; }
   font-size: 22px;
   line-height: 1.1;
   letter-spacing: -.02em;
-  color: var(--text);
   margin-bottom: 12px;
 }
-.cta-block p {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.45;
-  margin-bottom: 18px;
+@media (min-width: 768px) {
+  .cta-block h3 { font-size: 28px; margin-bottom: 14px; }
 }
+.cta-block p { font-size: 13px; color: var(--text-dim); line-height: 1.5; margin-bottom: 18px; }
+@media (min-width: 768px) { .cta-block p { margin-bottom: 0; } }
 .cta-stack { display: flex; flex-direction: column; gap: 10px; }
 
-/* ── ABOUT — Header ───────────────────────────────────────── */
-.about-header { padding: 8px var(--px) 28px; }
+/* Photo slot section */
+.px-section { padding-left: var(--px); padding-right: var(--px); }
+
+/* ═══════════════════════════════════════════════════════════
+   CHI SIAMO
+   ═══════════════════════════════════════════════════════════ */
+.about-header { padding: 40px var(--px) 36px; }
+@media (min-width: 768px) {
+  .about-header { padding-top: 64px; display: flex; gap: 80px; align-items: flex-start; }
+  .about-header-text { flex: 1; }
+  .about-header-side { flex: 0 0 320px; padding-top: 24px; }
+}
+
+.about-header .kicker { margin-bottom: 14px; }
 .about-header h1 {
   font-family: 'Manrope', system-ui;
   font-weight: 800;
   font-size: 38px;
   line-height: .98;
   letter-spacing: -.035em;
-  color: var(--text);
   margin-bottom: 20px;
 }
-.about-header p {
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--text-dim);
-}
+@media (min-width: 768px) { .about-header h1 { font-size: 52px; } }
+.about-header p { font-size: 15px; line-height: 1.6; color: var(--text-dim); }
 
-/* ── ABOUT — Stats ────────────────────────────────────────── */
+/* Stats */
+.stats-wrap { padding: 0 var(--px) 36px; }
 .stats-grid {
   border-radius: 16px;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  overflow: hidden;
   background: var(--surf);
   border: 1px solid transparent;
   background-image:
@@ -408,19 +558,31 @@ img { display: block; max-width: 100%; }
     linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.04) 30%, rgba(0,0,0,.5));
   background-origin: border-box;
   background-clip: padding-box, border-box;
-  overflow: hidden;
 }
+@media (min-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
 .stat-cell {
-  padding: 20px 16px;
+  padding: 24px 20px;
   border-right: 1px solid var(--line-soft);
   border-bottom: 1px solid var(--line-soft);
 }
-.stat-cell:nth-child(even) { border-right: none; }
-.stat-cell:nth-child(n+3) { border-bottom: none; }
+/* Mobile 2 cols */
+.stat-cell:nth-child(even)  { border-right: none; }
+.stat-cell:nth-child(n+3)   { border-bottom: none; }
+/* Desktop 4 cols */
+@media (min-width: 768px) {
+  .stat-cell:nth-child(even) { border-right: 1px solid var(--line-soft); }
+  .stat-cell:nth-child(n+3)  { border-bottom: 1px solid var(--line-soft); }
+  .stat-cell:last-child      { border-right: none; }
+  .stat-cell                 { border-bottom: none; }
+}
+
 .stat-num {
   font-family: 'Manrope', system-ui;
   font-weight: 800;
-  font-size: 32px;
+  font-size: 36px;
   line-height: 1;
   letter-spacing: -.04em;
   background: linear-gradient(180deg, #fff 0%, #b8b8c0 80%, #6e6e78 100%);
@@ -437,68 +599,85 @@ img { display: block; max-width: 100%; }
   color: var(--text-mute);
 }
 
-/* ── ABOUT — Values ───────────────────────────────────────── */
-.values { padding: 6px var(--px) 30px; display: flex; flex-direction: column; gap: 12px; }
-.value-card {
-  border-radius: var(--r-card);
-  padding: 18px;
+/* Story */
+.story-wrap { padding: 6px var(--px) 36px; }
+.story-wrap p { font-size: 14px; line-height: 1.65; color: var(--text-dim); max-width: 680px; }
+
+/* Values */
+.values {
+  padding: 6px var(--px) 36px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
-.value-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
+@media (min-width: 768px) {
+  .values { grid-template-columns: repeat(3, 1fr); gap: 16px; }
 }
+
+.value-card { border-radius: var(--r-card); padding: 22px; }
+.value-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .value-check {
   width: 22px; height: 22px;
   border-radius: 6px;
   background: var(--red);
   color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
-.value-title {
+.value-title { font-family: 'Manrope', system-ui; font-weight: 700; font-size: 15px; letter-spacing: -.005em; }
+.value-body { padding-left: 32px; font-size: 13px; line-height: 1.5; color: var(--text-dim); }
+
+/* ═══════════════════════════════════════════════════════════
+   CONTATTI
+   ═══════════════════════════════════════════════════════════ */
+.contact-header { padding: 40px var(--px) 28px; }
+@media (min-width: 768px) { .contact-header { padding-top: 64px; } }
+.contact-header .kicker { margin-bottom: 14px; }
+.contact-header h1 {
   font-family: 'Manrope', system-ui;
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--text);
-  letter-spacing: -.005em;
+  font-weight: 800;
+  font-size: 38px;
+  line-height: .98;
+  letter-spacing: -.035em;
 }
-.value-body {
-  padding-left: 32px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--text-dim);
+@media (min-width: 768px) { .contact-header h1 { font-size: 52px; } }
+
+/* 2-column desktop layout */
+.contact-body { padding: 0 var(--px); }
+@media (min-width: 768px) {
+  .contact-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+  }
 }
 
-/* ── CONTACT — Quick actions ──────────────────────────────── */
+/* Quick actions */
 .action-grid {
-  padding: 0 var(--px) 22px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  margin-bottom: 22px;
 }
+@media (min-width: 768px) { .action-grid { gap: 12px; } }
+
 .action-tile {
   border-radius: 12px;
-  padding: 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  text-decoration: none;
   transition: opacity .15s;
 }
-.action-tile:active { opacity: .8; }
+.action-tile:hover { opacity: .85; }
 .action-tile.primary {
   background: linear-gradient(180deg, rgba(200,32,44,.18) 0%, var(--surf) 80%);
 }
 .action-icon {
   width: 32px; height: 32px;
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
 }
 .action-icon.primary-icon { background: var(--red); color: #fff; }
 .action-icon.muted-icon { background: var(--bg); border: 1px solid var(--line); color: var(--red); }
@@ -519,19 +698,18 @@ img { display: block; max-width: 100%; }
   word-break: break-word;
 }
 
-/* ── CONTACT — Map ────────────────────────────────────────── */
+/* Map */
 .map-wrap {
-  margin: 0 var(--px) 22px;
   border-radius: var(--r-card);
   overflow: hidden;
   position: relative;
   height: 220px;
   border: 1px solid var(--line);
+  margin-bottom: 22px;
 }
-.map-bg {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, #14141a 0%, #0e0e13 100%);
-}
+@media (min-width: 768px) { .map-wrap { height: 260px; } }
+
+.map-bg { position: absolute; inset: 0; background: linear-gradient(180deg, #14141a 0%, #0e0e13 100%); }
 .map-overlay {
   position: absolute; left: 14px; right: 14px; bottom: 14px;
   display: flex;
@@ -539,21 +717,12 @@ img { display: block; max-width: 100%; }
   align-items: center;
   padding: 12px 14px;
   border-radius: 10px;
-  background: rgba(10,10,12,.85);
+  background: rgba(10,10,12,.88);
   backdrop-filter: blur(8px);
   border: 1px solid var(--line);
 }
-.map-name {
-  font-family: 'Manrope', system-ui;
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--text);
-}
-.map-addr {
-  font-size: 11.5px;
-  color: var(--text-dim);
-  margin-top: 2px;
-}
+.map-name { font-family: 'Manrope', system-ui; font-weight: 700; font-size: 13px; }
+.map-addr { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
 .map-open-btn {
   padding: 8px 12px;
   border-radius: 8px;
@@ -565,11 +734,10 @@ img { display: block; max-width: 100%; }
   letter-spacing: .08em;
   text-transform: uppercase;
   flex-shrink: 0;
-  text-decoration: none;
 }
 
-/* ── CONTACT — Hours ──────────────────────────────────────── */
-.hours-card { margin: 6px var(--px) 0; border-radius: var(--r-card); padding: 4px 18px; }
+/* Hours */
+.hours-card { border-radius: var(--r-card); padding: 4px 18px; margin-bottom: 14px; }
 .hour-row {
   padding: 14px 0;
   display: flex;
@@ -578,22 +746,10 @@ img { display: block; max-width: 100%; }
   border-bottom: 1px solid var(--line-soft);
 }
 .hour-row:last-child { border-bottom: none; }
-.hour-day {
-  font-family: 'Manrope', system-ui;
-  font-weight: 700;
-  font-size: 13.5px;
-  color: var(--text);
-}
-.hour-day.muted { color: var(--text-mute); }
-.hour-time {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11.5px;
-  color: var(--text-dim);
-  letter-spacing: .02em;
-}
-.hour-time.muted { color: var(--text-mute); }
+.hour-day { font-family: 'Manrope', system-ui; font-weight: 700; font-size: 13.5px; }
+.hour-day.muted, .hour-time.muted { color: var(--text-mute); }
+.hour-time { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: var(--text-dim); letter-spacing: .02em; }
 .hours-note {
-  margin: 14px var(--px) 30px;
   padding: 12px 14px;
   background: rgba(200,32,44,.08);
   border: 1px solid rgba(200,32,44,.25);
@@ -601,21 +757,13 @@ img { display: block; max-width: 100%; }
   display: flex;
   gap: 10px;
   align-items: center;
+  margin-bottom: 28px;
 }
-.hours-note span {
-  font-size: 12.5px;
-  color: var(--text-dim);
-  line-height: 1.4;
-}
+.hours-note span { font-size: 12.5px; color: var(--text-dim); line-height: 1.4; }
 
-/* ── CONTACT — Form ───────────────────────────────────────── */
-.form-wrap {
-  padding: 6px var(--px) 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* Form */
+.form-wrap { display: flex; flex-direction: column; gap: 12px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .field { display: flex; flex-direction: column; gap: 6px; }
 .field label {
   font-family: 'JetBrains Mono', monospace;
@@ -630,7 +778,7 @@ img { display: block; max-width: 100%; }
   border-radius: 10px;
   padding: 14px;
   font-family: 'Inter Tight', system-ui;
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--text);
   outline: none;
   transition: border-color .15s;
@@ -639,34 +787,40 @@ img { display: block; max-width: 100%; }
 }
 .field input::placeholder, .field textarea::placeholder { color: var(--text-mute); }
 .field input:focus, .field textarea:focus { border-color: var(--red); }
-.field textarea { resize: vertical; min-height: 80px; }
+.field textarea { resize: vertical; min-height: 90px; }
 .field input.mono { font-family: 'JetBrains Mono', monospace; letter-spacing: .05em; }
-.form-note {
-  font-size: 11px;
-  color: var(--text-mute);
-  line-height: 1.5;
-  margin-top: 4px;
-}
+.form-note { font-size: 11px; color: var(--text-mute); line-height: 1.5; margin-top: 2px; }
 
 /* ── Footer ───────────────────────────────────────────────── */
-.footer { padding: 0 var(--px) 12px; }
-.footer-logo { height: 26px; width: auto; margin-bottom: 14px; }
-.footer-info {
-  font-size: 11.5px;
-  color: var(--text-mute);
-  line-height: 1.6;
-  margin-bottom: 14px;
+.footer-wrap {
+  padding: 36px var(--px) 24px;
 }
+@media (min-width: 768px) {
+  .footer-wrap {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 40px;
+    padding-top: 40px;
+    padding-bottom: 32px;
+  }
+}
+.footer-logo { height: 26px; width: auto; margin-bottom: 14px; }
+.footer-info { font-size: 11.5px; color: var(--text-mute); line-height: 1.6; margin-bottom: 14px; }
 .footer-social { display: flex; gap: 8px; }
+@media (min-width: 768px) {
+  .footer-logo { margin-bottom: 12px; }
+  .footer-info { margin-bottom: 12px; }
+}
 
-/* ── Bottom navigation ────────────────────────────────────── */
+/* ── Bottom nav (mobile only) ─────────────────────────────── */
 .bottom-nav {
   position: fixed;
   bottom: 0; left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  max-width: 520px;
-  height: var(--nav-h);
+  max-width: var(--max-w);
+  height: var(--botnav-h);
   background: rgba(10,10,12,.92);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -677,23 +831,21 @@ img { display: block; max-width: 100%; }
   z-index: 50;
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
+@media (min-width: 768px) { .bottom-nav { display: none; } }
+
 .nav-item {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 4px;
   padding: 8px 0;
   cursor: pointer;
-  transition: opacity .15s;
   color: var(--text-mute);
-  border: none;
-  background: none;
+  transition: color .15s;
 }
 .nav-item.active { color: var(--red); }
-.nav-item:hover { color: var(--text-dim); }
-.nav-item.active:hover { color: var(--red); }
+.nav-item:hover:not(.active) { color: var(--text-dim); }
 .nav-label {
   font-family: 'JetBrains Mono', monospace;
   font-size: 9px;
@@ -701,37 +853,41 @@ img { display: block; max-width: 100%; }
   text-transform: uppercase;
 }
 
-/* ── Utility ──────────────────────────────────────────────── */
-.mb-30 { margin-bottom: 30px; }
-.mb-22 { margin-bottom: 22px; }
+/* Spacing helpers */
+.mb-36 { margin-bottom: 36px; }
 .mb-28 { margin-bottom: 28px; }
-.px { padding-left: var(--px); padding-right: var(--px); }
-
-/* ── Responsive desktop ───────────────────────────────────── */
-@media (min-width: 521px) {
-  #app { border-left: 1px solid var(--line-soft); border-right: 1px solid var(--line-soft); }
-  .bottom-nav { border-left: 1px solid var(--line-soft); border-right: 1px solid var(--line-soft); }
-}
-
-/* ── Smooth page transitions ──────────────────────────────── */
-.page { animation: none; }
-.page.active { animation: fadeIn .2s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.mb-22 { margin-bottom: 22px; }
+.mt-28 { margin-top: 28px; }
 </style>
 </head>
 
 <body>
 <div id="app">
 
-  <!-- ════════════════ HOME ════════════════ -->
+  <!-- ════ DESKTOP NAV ════ -->
+  <nav class="desktop-nav" role="navigation">
+    <img src="assets/logo-dark.png" alt="Prenestina Ricambi" class="desktop-nav-logo" onclick="showPage('home')">
+    <div class="desktop-nav-links">
+      <button id="dnav-home"    onclick="showPage('home')"    class="active">Home</button>
+      <button id="dnav-about"   onclick="showPage('about')">Chi siamo</button>
+      <button id="dnav-contact" onclick="showPage('contact')">Contatti</button>
+      <a href="tel:+39060000000" class="btn-red desktop-nav-cta" style="height:38px;font-size:13px;padding:0 18px;margin-left:8px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
+        Chiama ora
+      </a>
+    </div>
+  </nav>
+
+
+  <!-- ════════════════════════════════════
+       HOME
+  ═══════════════════════════════════════ -->
   <section id="page-home" class="page active">
 
+    <!-- Mobile topbar -->
     <header class="topbar">
       <img src="assets/logo-dark.png" alt="Prenestina Ricambi" class="topbar-logo">
       <div class="topbar-actions">
-        <button class="icon-btn" aria-label="Cerca">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        </button>
         <button class="icon-btn" aria-label="Menu" onclick="showPage('about')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
@@ -744,39 +900,48 @@ img { display: block; max-width: 100%; }
         <div class="hero-stripe-bg"></div>
         <div class="hero-red-bar"></div>
         <div class="hero-chrome-bar"></div>
+
         <div class="hero-copy">
           <div class="kicker">— Aprilia · dal 1998</div>
-          <h1>Il ricambio<br><span class="chrome-text">giusto.</span> Subito.</h1>
+          <h1>Il ricambio<br><span class="chrome-text">giusto.</span><br>Subito.</h1>
           <p>Ricambi auto e moto per privati, officine e rivenditori. A magazzino o su ordinazione in 24/48h.</p>
-          <a href="tel:+39060000000" class="btn-red">
-            Chiama ora
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
-          </a>
+          <div class="hero-btns">
+            <a href="tel:+39060000000" class="btn-red">
+              Chiama ora
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
+            </a>
+            <button class="btn-ghost" onclick="showPage('contact')">Richiedi ricambio</button>
+          </div>
+        </div>
+
+        <!-- Desktop only: right photo column -->
+        <div class="hero-photo-col" style="display:none" id="hero-photo">
+          <div class="photo-slot" style="height:100%">foto negozio</div>
         </div>
       </div>
     </div>
 
     <!-- Categorie -->
     <div class="cats">
-      <div class="cat-pill">
+      <div class="cat-pill chrome-card">
         <span class="cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14l2-6a2 2 0 0 1 2-1h10a2 2 0 0 1 2 1l2 6"/><path d="M3 14h18v4a1 1 0 0 1-1 1h-1a2 2 0 0 1-2-2H7a2 2 0 0 1-2 2H4a1 1 0 0 1-1-1v-4z"/><circle cx="7.5" cy="16.5" r="1"/><circle cx="16.5" cy="16.5" r="1"/></svg></span>
         <span class="cat-label">Auto</span>
       </div>
-      <div class="cat-pill">
+      <div class="cat-pill chrome-card">
         <span class="cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="17" r="3"/><circle cx="19" cy="17" r="3"/><path d="M5 17h6l4-7h3M9 10l3 7M14 7h4"/></svg></span>
         <span class="cat-label">Moto</span>
       </div>
-      <div class="cat-pill">
+      <div class="cat-pill chrome-card">
         <span class="cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 1 0 5 5L21 13l-2 2-1.7-1.7-2 2L19 19l-2 2-3.7-3.7-2 2L13 21l-2 2-1.7-1.7-2 2L3 19l2-2-1.7-1.7 2-2L3 9l2-2 3.7 3.7 2-2L7 5l2-2 1.7 1.7 2-2L17 7l-2 2-.3-.7z"/></svg></span>
         <span class="cat-label">Officina</span>
       </div>
-      <div class="cat-pill">
+      <div class="cat-pill chrome-card">
         <span class="cat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v7c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V5l-8-3z"/></svg></span>
         <span class="cat-label">Originali</span>
       </div>
     </div>
 
-    <div class="chrome-rule mb-30"></div>
+    <div class="chrome-rule mb-36"></div>
 
     <!-- Servizi -->
     <div class="section-head">
@@ -785,27 +950,21 @@ img { display: block; max-width: 100%; }
     </div>
     <div class="services">
       <div class="service-card chrome-card">
-        <div class="service-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h11v10H2zM13 10h5l3 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
-        </div>
+        <div class="service-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 7h11v10H2zM13 10h5l3 4v3h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></div>
         <div>
           <div class="service-title">Consegne in zona</div>
           <div class="service-sub">Aprilia · Latina · Pomezia in giornata</div>
         </div>
       </div>
       <div class="service-card chrome-card">
-        <div class="service-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 1 0 5 5L21 13l-2 2-1.7-1.7-2 2L19 19l-2 2-3.7-3.7-2 2L13 21l-2 2-1.7-1.7-2 2L3 19l2-2-1.7-1.7 2-2L3 9l2-2 3.7 3.7 2-2L7 5l2-2 1.7 1.7 2-2L17 7l-2 2-.3-.7z"/></svg>
-        </div>
+        <div class="service-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 1 0 5 5L21 13l-2 2-1.7-1.7-2 2L19 19l-2 2-3.7-3.7-2 2L13 21l-2 2-1.7-1.7-2 2L3 19l2-2-1.7-1.7 2-2L3 9l2-2 3.7 3.7 2-2L7 5l2-2 1.7 1.7 2-2L17 7l-2 2-.3-.7z"/></svg></div>
         <div>
           <div class="service-title">Ordini speciali</div>
-          <div class="service-sub">Ricambi non a magazzino su richiesta in 24/48h</div>
+          <div class="service-sub">Ricambi non a magazzino in 24/48h</div>
         </div>
       </div>
       <div class="service-card chrome-card">
-        <div class="service-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v7c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V5l-8-3z"/></svg>
-        </div>
+        <div class="service-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v7c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V5l-8-3z"/></svg></div>
         <div>
           <div class="service-title">Solo ricambi originali</div>
           <div class="service-sub">O qualità OE certificata equivalente</div>
@@ -836,17 +995,19 @@ img { display: block; max-width: 100%; }
       <p class="brands-note">+ 50 altri · chiedici quello che cerchi</p>
     </div>
 
-    <!-- Foto negozio -->
-    <div class="px mb-30">
-      <div class="photo-slot" style="height:200px">foto negozio · banco vendita</div>
+    <!-- Foto negozio (mobile) -->
+    <div class="px-section mb-36">
+      <div class="photo-slot" style="height:200px" id="home-photo-mobile">foto negozio · banco vendita</div>
     </div>
 
     <!-- CTA block -->
     <div class="cta-block">
-      <div class="kicker">— Non lo trovi?</div>
-      <h3>Mandaci la targa<br>o il codice originale.</h3>
-      <p>Ti rispondiamo entro un'ora con disponibilità e prezzo. WhatsApp è il canale più veloce.</p>
-      <div class="cta-stack">
+      <div class="cta-block-text">
+        <div class="kicker">— Non lo trovi?</div>
+        <h3>Mandaci la targa<br>o il codice originale.</h3>
+        <p>Ti rispondiamo entro un'ora con disponibilità e prezzo. WhatsApp è il canale più veloce.</p>
+      </div>
+      <div class="cta-block-actions cta-stack">
         <a href="https://wa.me/39330000000" class="btn-red full">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.5-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.8 1.2 3 .1.2 2 3 4.7 4.2 1.7.7 2.3.8 3.2.6.5-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.4zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.1 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
           Scrivi su WhatsApp
@@ -855,85 +1016,63 @@ img { display: block; max-width: 100%; }
       </div>
     </div>
 
-    <div class="chrome-rule mb-22"></div>
-    <footer class="footer">
-      <img src="assets/logo-dark.png" alt="Prenestina Ricambi" class="footer-logo">
-      <p class="footer-info">Ricambi auto e moto · Aprilia (LT)<br>P.IVA — · © 2026</p>
-      <div class="footer-social">
-        <button class="icon-btn" aria-label="Instagram">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
-        </button>
-        <button class="icon-btn" aria-label="Facebook">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 22v-8h3l1-4h-4V7.5c0-1.1.4-2 2-2h2V2h-3c-3 0-5 1.8-5 5v3H6v4h3v8h4z"/></svg>
-        </button>
-        <a href="https://wa.me/39330000000" class="icon-btn" aria-label="WhatsApp">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.5-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.8 1.2 3 .1.2 2 3 4.7 4.2 1.7.7 2.3.8 3.2.6.5-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.4zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.1 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
-        </a>
+    <div class="chrome-rule mb-22" style="margin-top:36px"></div>
+    <footer class="footer-wrap">
+      <div>
+        <img src="assets/logo-dark.png" alt="Prenestina Ricambi" class="footer-logo">
+        <p class="footer-info">Ricambi auto e moto · Aprilia (LT)<br>P.IVA — · © 2026</p>
+        <div class="footer-social">
+          <button class="icon-btn" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></button>
+          <button class="icon-btn" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 22v-8h3l1-4h-4V7.5c0-1.1.4-2 2-2h2V2h-3c-3 0-5 1.8-5 5v3H6v4h3v8h4z"/></svg></button>
+          <a href="https://wa.me/39330000000" class="icon-btn" aria-label="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.5-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.8 1.2 3 .1.2 2 3 4.7 4.2 1.7.7 2.3.8 3.2.6.5-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.4zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.1 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg></a>
+        </div>
       </div>
     </footer>
   </section>
 
 
-  <!-- ════════════════ CHI SIAMO ════════════════ -->
+  <!-- ════════════════════════════════════
+       CHI SIAMO
+  ═══════════════════════════════════════ -->
   <section id="page-about" class="page">
 
     <header class="topbar">
       <img src="assets/logo-dark.png" alt="Prenestina Ricambi" class="topbar-logo">
       <div class="topbar-actions">
-        <button class="icon-btn" aria-label="Menu">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-        </button>
+        <button class="icon-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       </div>
     </header>
 
-    <!-- Header -->
     <div class="about-header">
-      <div class="kicker">— Chi siamo</div>
-      <h1>Una ricambi<br>di <span class="chrome-text">quartiere</span><br>che non sbaglia ordine.</h1>
-      <p>Siamo Prenestina Ricambi, ad Aprilia. Lavoriamo con officine, carrozzerie e privati che hanno bisogno del pezzo giusto, alla prima.</p>
-    </div>
-
-    <!-- Foto -->
-    <div class="px mb-28">
-      <div class="photo-slot" style="height:220px">foto squadra · banco vendita</div>
-    </div>
-
-    <!-- Stats -->
-    <div class="px mb-30">
-      <div class="stats-grid">
-        <div class="stat-cell">
-          <div class="stat-num">25+</div>
-          <div class="stat-label">Anni di attività</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-num">60</div>
-          <div class="stat-label">Marchi trattati</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-num">24h</div>
-          <div class="stat-label">Ordini speciali</div>
-        </div>
-        <div class="stat-cell">
-          <div class="stat-num">3</div>
-          <div class="stat-label">Comuni serviti</div>
-        </div>
+      <div class="about-header-text">
+        <div class="kicker">— Chi siamo</div>
+        <h1>Una ricambi<br>di <span class="chrome-text">quartiere</span><br>che non sbaglia ordine.</h1>
+        <p>Siamo Prenestina Ricambi, ad Aprilia. Lavoriamo con officine, carrozzerie e privati che hanno bisogno del pezzo giusto, alla prima.</p>
+      </div>
+      <div class="about-header-side">
+        <div class="photo-slot" style="height:220px">foto squadra · banco vendita</div>
       </div>
     </div>
 
-    <div class="chrome-rule mb-30"></div>
+    <div class="stats-wrap">
+      <div class="stats-grid">
+        <div class="stat-cell"><div class="stat-num">25+</div><div class="stat-label">Anni di attività</div></div>
+        <div class="stat-cell"><div class="stat-num">60</div><div class="stat-label">Marchi trattati</div></div>
+        <div class="stat-cell"><div class="stat-num">24h</div><div class="stat-label">Ordini speciali</div></div>
+        <div class="stat-cell"><div class="stat-num">3</div><div class="stat-label">Comuni serviti</div></div>
+      </div>
+    </div>
 
-    <!-- Storia -->
+    <div class="chrome-rule mb-36"></div>
+
     <div class="section-head">
       <div class="kicker">— La nostra storia</div>
       <h2>Aprilia, fine anni '90.</h2>
     </div>
-    <div class="px mb-30">
-      <p style="font-size:14px;line-height:1.6;color:var(--text-dim)">
-        Abbiamo aperto un piccolo negozio ad Aprilia perché in zona mancava un punto di riferimento serio per i ricambi auto. Negli anni siamo cresciuti — sono arrivate le moto, gli scooter, i furgoni — ma il modo di lavorare è rimasto lo stesso: capire cosa serve, trovarlo, consegnarlo in fretta.
-      </p>
+    <div class="story-wrap">
+      <p>Abbiamo aperto un piccolo negozio ad Aprilia perché in zona mancava un punto di riferimento serio per i ricambi auto. Negli anni siamo cresciuti — sono arrivate le moto, gli scooter, i furgoni — ma il modo di lavorare è rimasto lo stesso: capire cosa serve, trovarlo, consegnarlo in fretta.</p>
     </div>
 
-    <!-- Valori -->
     <div class="section-head">
       <div class="kicker">— Come lavoriamo</div>
       <h2>Tre cose, fatte bene.</h2>
@@ -941,234 +1080,185 @@ img { display: block; max-width: 100%; }
     <div class="values">
       <div class="value-card chrome-card">
         <div class="value-head">
-          <div class="value-check">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
-          </div>
+          <div class="value-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
           <div class="value-title">Ricambi originali</div>
         </div>
         <p class="value-body">Lavoriamo con i fornitori ufficiali. Niente sorprese, niente compatibili scadenti.</p>
       </div>
       <div class="value-card chrome-card">
         <div class="value-head">
-          <div class="value-check">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
-          </div>
+          <div class="value-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
           <div class="value-title">Conoscenza tecnica</div>
         </div>
         <p class="value-body">Dietro al banco c'è chi smonta motori da vent'anni. Ti diciamo quello che ti serve davvero.</p>
       </div>
       <div class="value-card chrome-card">
         <div class="value-head">
-          <div class="value-check">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
-          </div>
+          <div class="value-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
           <div class="value-title">Tempi seri</div>
         </div>
         <p class="value-body">Se diciamo domattina, è domattina. Se non è disponibile, te lo diciamo subito.</p>
       </div>
     </div>
 
-    <!-- Foto magazzino -->
-    <div class="px mb-30">
-      <div class="photo-slot" style="height:180px">foto · interni magazzino</div>
+    <div class="px-section mb-36">
+      <div class="photo-slot" style="height:220px">foto · interni magazzino</div>
     </div>
 
-    <!-- CTA -->
-    <div class="px mb-30">
-      <a href="#" onclick="showPage('contact'); return false;" class="btn-red full">
+    <div class="px-section mb-36">
+      <a href="#" onclick="showPage('contact'); return false;" class="btn-red">
         Vieni a trovarci
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
       </a>
     </div>
 
     <div class="chrome-rule mb-22"></div>
-    <footer class="footer">
-      <img src="assets/logo-dark.png" alt="Prenestina Ricambi" class="footer-logo">
-      <p class="footer-info">Ricambi auto e moto · Aprilia (LT)<br>P.IVA — · © 2026</p>
-      <div class="footer-social">
-        <button class="icon-btn" aria-label="Instagram">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
-        </button>
-        <button class="icon-btn" aria-label="Facebook">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 22v-8h3l1-4h-4V7.5c0-1.1.4-2 2-2h2V2h-3c-3 0-5 1.8-5 5v3H6v4h3v8h4z"/></svg>
-        </button>
-        <a href="https://wa.me/39330000000" class="icon-btn" aria-label="WhatsApp">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.5-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.8 1.2 3 .1.2 2 3 4.7 4.2 1.7.7 2.3.8 3.2.6.5-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.4zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.1 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
-        </a>
+    <footer class="footer-wrap">
+      <div>
+        <img src="assets/logo-dark.png" alt="Prenestina Ricambi" class="footer-logo">
+        <p class="footer-info">Ricambi auto e moto · Aprilia (LT)<br>P.IVA — · © 2026</p>
+        <div class="footer-social">
+          <button class="icon-btn" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></button>
+          <button class="icon-btn" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 22v-8h3l1-4h-4V7.5c0-1.1.4-2 2-2h2V2h-3c-3 0-5 1.8-5 5v3H6v4h3v8h4z"/></svg></button>
+          <a href="https://wa.me/39330000000" class="icon-btn" aria-label="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.5-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.8 1.2 3 .1.2 2 3 4.7 4.2 1.7.7 2.3.8 3.2.6.5-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.4zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.1 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg></a>
+        </div>
       </div>
     </footer>
   </section>
 
 
-  <!-- ════════════════ CONTATTI ════════════════ -->
+  <!-- ════════════════════════════════════
+       CONTATTI
+  ═══════════════════════════════════════ -->
   <section id="page-contact" class="page">
 
     <header class="topbar">
       <img src="assets/logo-dark.png" alt="Prenestina Ricambi" class="topbar-logo">
       <div class="topbar-actions">
-        <button class="icon-btn" aria-label="Menu">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-        </button>
+        <button class="icon-btn" aria-label="Menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       </div>
     </header>
 
-    <!-- Header -->
-    <div class="about-header" style="padding-bottom:22px">
+    <div class="contact-header">
       <div class="kicker">— Contatti</div>
       <h1>Passa, chiama,<br>scrivi. <span class="chrome-text">Come preferisci.</span></h1>
     </div>
 
-    <!-- Quick actions -->
-    <div class="action-grid">
-      <a href="tel:+39060000000" class="action-tile chrome-card primary">
-        <div class="action-icon primary-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
-        </div>
-        <div>
-          <div class="action-key">Chiama</div>
-          <div class="action-val">06 0000 0000</div>
-        </div>
-      </a>
-      <a href="https://wa.me/39330000000" class="action-tile chrome-card">
-        <div class="action-icon muted-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.5-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.8 1.2 3 .1.2 2 3 4.7 4.2 1.7.7 2.3.8 3.2.6.5-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.4zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.1 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
-        </div>
-        <div>
-          <div class="action-key">WhatsApp</div>
-          <div class="action-val">+39 333 000 0000</div>
-        </div>
-      </a>
-      <a href="mailto:info@prenestinaricambi.it" class="action-tile chrome-card">
-        <div class="action-icon muted-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
-        </div>
-        <div>
-          <div class="action-key">Email</div>
-          <div class="action-val" style="font-size:11px">info@prenestina<wbr>ricambi.it</div>
-        </div>
-      </a>
-      <a href="https://maps.google.com/?q=Aprilia+LT" target="_blank" class="action-tile chrome-card">
-        <div class="action-icon muted-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        </div>
-        <div>
-          <div class="action-key">Indirizzo</div>
-          <div class="action-val" style="font-size:12px">Via —, Aprilia (LT)</div>
-        </div>
-      </a>
-    </div>
+    <!-- 2-col on desktop -->
+    <div class="contact-body">
 
-    <!-- Mappa -->
-    <div class="map-wrap">
-      <div class="map-bg">
-        <svg width="100%" height="100%" viewBox="0 0 360 220" preserveAspectRatio="none" style="position:absolute;inset:0">
-          <defs>
-            <pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse">
-              <path d="M20 0H0V20" fill="none" stroke="#1f1f27" stroke-width="0.5"/>
-            </pattern>
-          </defs>
-          <rect width="360" height="220" fill="url(#g)"/>
-          <path d="M0 80 L 360 60" stroke="#33333d" stroke-width="14" fill="none"/>
-          <path d="M0 80 L 360 60" stroke="#23232b" stroke-width="10" fill="none"/>
-          <path d="M120 0 L 140 220" stroke="#33333d" stroke-width="10" fill="none"/>
-          <path d="M120 0 L 140 220" stroke="#23232b" stroke-width="6" fill="none"/>
-          <path d="M0 160 Q 180 130 360 180" stroke="#2a2a33" stroke-width="8" fill="none"/>
-          <rect x="180" y="100" width="80" height="50" fill="#161620" rx="4"/>
-          <rect x="40" y="130" width="60" height="40" fill="#161620" rx="4"/>
-        </svg>
-        <!-- Pin marker -->
-        <div style="position:absolute;left:52%;top:38%;transform:translate(-50%,-100%)">
-          <div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--red);box-shadow:0 0 20px var(--red),0 4px 10px rgba(0,0,0,.6);border:2px solid #fff"></div>
-          <div style="position:absolute;left:50%;top:5px;width:10px;height:10px;border-radius:50%;background:#fff;transform:translateX(-50%)"></div>
+      <!-- Left col: form + quick actions -->
+      <div>
+        <div class="action-grid">
+          <a href="tel:+39060000000" class="action-tile chrome-card primary">
+            <div class="action-icon primary-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg></div>
+            <div><div class="action-key">Chiama</div><div class="action-val">06 0000 0000</div></div>
+          </a>
+          <a href="https://wa.me/39330000000" class="action-tile chrome-card">
+            <div class="action-icon muted-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.5-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.8 1.2 3 .1.2 2 3 4.7 4.2 1.7.7 2.3.8 3.2.6.5-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.4zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.1 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg></div>
+            <div><div class="action-key">WhatsApp</div><div class="action-val">+39 333 000 0000</div></div>
+          </a>
+          <a href="mailto:info@prenestinaricambi.it" class="action-tile chrome-card">
+            <div class="action-icon muted-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+            <div><div class="action-key">Email</div><div class="action-val" style="font-size:11px">info@prenestina<wbr>ricambi.it</div></div>
+          </a>
+          <a href="https://maps.google.com/?q=Aprilia+LT" target="_blank" class="action-tile chrome-card">
+            <div class="action-icon muted-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            <div><div class="action-key">Indirizzo</div><div class="action-val" style="font-size:12px">Via —, Aprilia (LT)</div></div>
+          </a>
+        </div>
+
+        <div class="section-head" style="padding:0;margin-bottom:14px">
+          <div class="kicker" style="margin-bottom:6px">— Richiesta ricambio</div>
+          <h2>Dicci cosa cerchi.</h2>
+        </div>
+        <form class="form-wrap" onsubmit="handleFormSubmit(event)">
+          <div class="field">
+            <label for="nome">Nome e cognome</label>
+            <input type="text" id="nome" name="nome" placeholder="Mario Rossi" autocomplete="name">
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="tel">Telefono</label>
+              <input type="tel" id="tel" name="telefono" placeholder="333 000 0000" autocomplete="tel">
+            </div>
+            <div class="field">
+              <label for="targa">Targa</label>
+              <input type="text" id="targa" name="targa" placeholder="AB 123 CD" class="mono">
+            </div>
+          </div>
+          <div class="field">
+            <label for="msg">Cosa ti serve</label>
+            <textarea id="msg" name="messaggio" placeholder="Es. pastiglie freno anteriori, filtro olio…" rows="4"></textarea>
+          </div>
+          <button type="submit" class="btn-red full">
+            Invia richiesta
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+          <p class="form-note">Ti rispondiamo entro 1h negli orari di apertura.</p>
+        </form>
+      </div>
+
+      <!-- Right col: map + hours -->
+      <div>
+        <div class="map-wrap">
+          <div class="map-bg">
+            <svg width="100%" height="100%" viewBox="0 0 360 260" preserveAspectRatio="none" style="position:absolute;inset:0">
+              <defs><pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="#1f1f27" stroke-width="0.5"/></pattern></defs>
+              <rect width="360" height="260" fill="url(#g)"/>
+              <path d="M0 80 L 360 60" stroke="#33333d" stroke-width="14" fill="none"/>
+              <path d="M0 80 L 360 60" stroke="#23232b" stroke-width="10" fill="none"/>
+              <path d="M120 0 L 140 260" stroke="#33333d" stroke-width="10" fill="none"/>
+              <path d="M120 0 L 140 260" stroke="#23232b" stroke-width="6" fill="none"/>
+              <path d="M0 180 Q 180 150 360 200" stroke="#2a2a33" stroke-width="8" fill="none"/>
+              <rect x="180" y="110" width="80" height="50" fill="#161620" rx="4"/>
+              <rect x="40" y="150" width="60" height="40" fill="#161620" rx="4"/>
+            </svg>
+            <div style="position:absolute;left:52%;top:40%;transform:translate(-50%,-100%)">
+              <div style="width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--red);box-shadow:0 0 20px var(--red),0 4px 10px rgba(0,0,0,.6);border:2px solid #fff"></div>
+              <div style="position:absolute;left:50%;top:5px;width:10px;height:10px;border-radius:50%;background:#fff;transform:translateX(-50%)"></div>
+            </div>
+          </div>
+          <div class="map-overlay">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <div style="flex:1"><div class="map-name">Prenestina Ricambi</div><div class="map-addr">Aprilia (LT) · indirizzo da confermare</div></div>
+            <a href="https://maps.google.com/?q=Aprilia+LT" target="_blank" class="map-open-btn">Apri</a>
+          </div>
+        </div>
+
+        <div class="section-head" style="padding:0;margin-bottom:14px">
+          <div class="kicker" style="margin-bottom:6px">— Orari</div>
+          <h2>Quando ci trovi aperti.</h2>
+        </div>
+        <div class="hours-card chrome-card">
+          <div class="hour-row"><span class="hour-day">Lun – Ven</span><span class="hour-time">08:30 – 13:00 · 15:30 – 19:30</span></div>
+          <div class="hour-row"><span class="hour-day">Sabato</span><span class="hour-time">08:30 – 13:00</span></div>
+          <div class="hour-row"><span class="hour-day muted">Domenica</span><span class="hour-time muted">Chiuso</span></div>
+        </div>
+        <div class="hours-note mt-28">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span>Per ordini urgenti fuori orario, scrivici su WhatsApp.</span>
         </div>
       </div>
-      <div class="map-overlay">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        <div style="flex:1">
-          <div class="map-name">Prenestina Ricambi</div>
-          <div class="map-addr">Aprilia (LT) · indirizzo da confermare</div>
+
+    </div><!-- /contact-body -->
+
+    <div class="chrome-rule mb-22" style="margin-top:40px"></div>
+    <footer class="footer-wrap">
+      <div>
+        <img src="assets/logo-dark.png" alt="Prenestina Ricambi" class="footer-logo">
+        <p class="footer-info">Ricambi auto e moto · Aprilia (LT)<br>P.IVA — · © 2026</p>
+        <div class="footer-social">
+          <button class="icon-btn" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></button>
+          <button class="icon-btn" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 22v-8h3l1-4h-4V7.5c0-1.1.4-2 2-2h2V2h-3c-3 0-5 1.8-5 5v3H6v4h3v8h4z"/></svg></button>
+          <a href="https://wa.me/39330000000" class="icon-btn" aria-label="WhatsApp"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.5-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.8 1.2 3 .1.2 2 3 4.7 4.2 1.7.7 2.3.8 3.2.6.5-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.4zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.1 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg></a>
         </div>
-        <a href="https://maps.google.com/?q=Aprilia+LT" target="_blank" class="map-open-btn">Apri</a>
-      </div>
-    </div>
-
-    <!-- Orari -->
-    <div class="section-head">
-      <div class="kicker">— Orari</div>
-      <h2>Quando ci trovi aperti.</h2>
-    </div>
-    <div class="hours-card chrome-card">
-      <div class="hour-row">
-        <span class="hour-day">Lun – Ven</span>
-        <span class="hour-time">08:30 – 13:00 · 15:30 – 19:30</span>
-      </div>
-      <div class="hour-row">
-        <span class="hour-day">Sabato</span>
-        <span class="hour-time">08:30 – 13:00</span>
-      </div>
-      <div class="hour-row">
-        <span class="hour-day muted">Domenica</span>
-        <span class="hour-time muted">Chiuso</span>
-      </div>
-    </div>
-    <div class="hours-note">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-      <span>Per ordini urgenti fuori orario, scrivici su WhatsApp.</span>
-    </div>
-
-    <div class="chrome-rule mb-22" style="margin-bottom:26px"></div>
-
-    <!-- Form -->
-    <div class="section-head">
-      <div class="kicker">— Richiesta ricambio</div>
-      <h2>Dicci cosa cerchi.</h2>
-    </div>
-    <form class="form-wrap" onsubmit="handleFormSubmit(event)">
-      <div class="field">
-        <label for="nome">Nome e cognome</label>
-        <input type="text" id="nome" name="nome" placeholder="Mario Rossi" autocomplete="name">
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label for="tel">Telefono</label>
-          <input type="tel" id="tel" name="telefono" placeholder="333 000 0000" autocomplete="tel">
-        </div>
-        <div class="field">
-          <label for="targa">Targa</label>
-          <input type="text" id="targa" name="targa" placeholder="AB 123 CD" class="mono">
-        </div>
-      </div>
-      <div class="field">
-        <label for="msg">Cosa ti serve</label>
-        <textarea id="msg" name="messaggio" placeholder="Es. pastiglie freno anteriori, filtro olio…" rows="4"></textarea>
-      </div>
-      <button type="submit" class="btn-red full">
-        Invia richiesta
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
-      </button>
-      <p class="form-note">Ti rispondiamo entro 1h negli orari di apertura.</p>
-    </form>
-
-    <div class="chrome-rule mb-22"></div>
-    <footer class="footer">
-      <img src="assets/logo-dark.png" alt="Prenestina Ricambi" class="footer-logo">
-      <p class="footer-info">Ricambi auto e moto · Aprilia (LT)<br>P.IVA — · © 2026</p>
-      <div class="footer-social">
-        <button class="icon-btn" aria-label="Instagram">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
-        </button>
-        <button class="icon-btn" aria-label="Facebook">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 22v-8h3l1-4h-4V7.5c0-1.1.4-2 2-2h2V2h-3c-3 0-5 1.8-5 5v3H6v4h3v8h4z"/></svg>
-        </button>
-        <a href="https://wa.me/39330000000" class="icon-btn" aria-label="WhatsApp">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.5-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5 0-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4 0 1.4 1 2.8 1.2 3 .1.2 2 3 4.7 4.2 1.7.7 2.3.8 3.2.6.5-.1 1.7-.7 1.9-1.4.2-.6.2-1.2.2-1.4-.1-.1-.3-.2-.6-.4zM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.4c1.4.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.3c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.1 15 3.6 13.5 3.6 12c0-4.6 3.8-8.4 8.4-8.4s8.4 3.8 8.4 8.4-3.8 8.3-8.4 8.3z"/></svg>
-        </a>
       </div>
     </footer>
   </section>
 
 
-  <!-- ════════════════ BOTTOM NAV ════════════════ -->
+  <!-- ════ BOTTOM NAV (mobile) ════ -->
   <nav class="bottom-nav" role="navigation" aria-label="Navigazione principale">
     <button class="nav-item active" id="nav-home" onclick="showPage('home')" aria-label="Home">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
@@ -1184,26 +1274,43 @@ img { display: block; max-width: 100%; }
     </button>
   </nav>
 
-</div>
+</div><!-- /#app -->
 
 <script>
   const PAGES = ['home', 'about', 'contact'];
+  const isDesktop = () => window.innerWidth >= 768;
 
   function showPage(id) {
     PAGES.forEach(p => {
       document.getElementById('page-' + p).classList.toggle('active', p === id);
-      document.getElementById('nav-' + p).classList.toggle('active', p === id);
+      const bn = document.getElementById('nav-' + p);
+      if (bn) bn.classList.toggle('active', p === id);
+      const dn = document.getElementById('dnav-' + p);
+      if (dn) dn.classList.toggle('active', p === id);
     });
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
+
+  // Show hero photo column on desktop
+  function applyLayout() {
+    const photo = document.getElementById('hero-photo');
+    const photoMobile = document.getElementById('home-photo-mobile');
+    if (photo && photoMobile) {
+      const desk = isDesktop();
+      photo.style.display = desk ? 'block' : 'none';
+      photoMobile.style.display = desk ? 'none' : 'flex';
+    }
+  }
+  applyLayout();
+  window.addEventListener('resize', applyLayout);
 
   function handleFormSubmit(e) {
     e.preventDefault();
     const btn = e.target.querySelector('button[type=submit]');
     btn.textContent = 'Richiesta inviata ✓';
     btn.style.background = 'linear-gradient(180deg,#2a8a3a 0%,#1a6a2a 100%)';
+    btn.style.boxShadow = 'none';
     btn.disabled = true;
-    // In produzione: fetch('/api/contatto', { method:'POST', body: new FormData(e.target) })
   }
 </script>
 
